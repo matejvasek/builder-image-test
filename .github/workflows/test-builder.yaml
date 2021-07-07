@@ -16,4 +16,4 @@ jobs:
         run: go build -v ./...
 
       - name: Run
-        run: 'echo ${{ toJson(github.event.client_payload) }} | ./builder-image-test'
+        run: 'echo "${{ toJson(github.event.client_payload) }}" | ./builder-image-test'
