@@ -5,11 +5,8 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
-	"regexp"
 	"strings"
 )
-
-var runtimeRegex = regexp.MustCompile(`faas-(\w+)-builder`)
 
 func main() {
 	data := struct {
@@ -18,6 +15,7 @@ func main() {
 		UpdatedTags []string `json:"updated_tags"`
 		Namespace   string   `json:"namespace"`
 		Name        string   `json:"name"`
+		Runtimes    []string `json:"runtimes"`
 	}{}
 
 	decoder := json.NewDecoder(os.Stdin)
@@ -27,13 +25,6 @@ func main() {
 		fmt.Fprintf(os.Stderr, "there are no updated tags")
 		os.Exit(1)
 	}
-
-	matches := runtimeRegex.FindStringSubmatch(data.Name)
-	if len(matches) < 2 {
-		fmt.Fprintln(os.Stderr, "failed to parse runtime from image name")
-		os.Exit(1)
-	}
-	runtime := matches[1]
 
 	workingDir, err := os.Getwd()
 	if err != nil {
@@ -54,12 +45,15 @@ func main() {
 	builderImg := data.DockerUrl + ":" + data.UpdatedTags[0]
 
 	failed := false
+
 	for _, funcBinary := range []string {"func_stable", "func_latest"} {
-		for _, template := range []string {"http", "events"} {
-			err = tryBuild(funcBinary, runtime, template, builderImg)
-			if err != nil {
-				fmt.Fprintf(os.Stderr, "failed to build the function (func binary: %q, template: %q): %q\n", funcBinary, template, err.Error())
-				failed = true
+		for _, runtime := range data.Runtimes {
+			for _, template := range []string {"http", "events"} {
+				err = tryBuild(funcBinary, runtime, template, builderImg)
+				if err != nil {
+					fmt.Fprintf(os.Stderr, "failed to build the function (func binary: %q, template: %q): %q\n", funcBinary, template, err.Error())
+					failed = true
+				}
 			}
 		}
 	}
