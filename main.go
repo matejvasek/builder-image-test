@@ -68,6 +68,7 @@ func main() {
 // func_latest -- latest main
 func installFunc(trg string) error {
 	script := fmt.Sprintf(`set -ex
+go get github.com/markbates/pkger/cmd/pkger
 cd $(mktemp -d)
 git clone https://github.com/boson-project/func
 cd func
