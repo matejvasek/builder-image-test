@@ -12,11 +12,8 @@ jobs:
         with:
           go-version: 1.16
 
-      - run: 'echo "field: ${{ github.event.client_payload.docker_url }}"'
-      - run: 'echo "payload: ${{ toJson(github.event.client_payload) }}"'
-
       - name: Build
         run: go build -v ./...
 
       - name: Run
-        run: ./builder-image-test
+        run: 'echo ${{ toJson(github.event.client_payload) }} | ./builder-image-test'
