@@ -43,6 +43,8 @@ func main() {
 	path := os.Getenv("PATH")
 	os.Setenv("PATH", fmt.Sprintf("%s:%s", workingDir, path))
 
+	os.Setenv("FUNC_REGISTRY", "example.com/jdoe")
+
 	err = installFunc(workingDir)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "failed to install func: %q\n", err.Error())
