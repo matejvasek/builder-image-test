@@ -8,11 +8,11 @@ import (
 
 func main() {
 	data := struct {
-		DockerUrl   string `json:"docker_url"`
-		Repository  string `json:"repository"`
-		UpdatedTags string `json:"updated_tags"`
-		Namespace   string `json:"namespace"`
-		Name        string `json:"name"`
+		DockerUrl   string   `json:"docker_url"`
+		Repository  string   `json:"repository"`
+		UpdatedTags []string `json:"updated_tags"`
+		Namespace   string   `json:"namespace"`
+		Name        string   `json:"name"`
 	}{}
 
 	decoder := json.NewDecoder(os.Stdin)
@@ -20,3 +20,5 @@ func main() {
 
 	fmt.Printf("data: %+v\n", data)
 }
+
+

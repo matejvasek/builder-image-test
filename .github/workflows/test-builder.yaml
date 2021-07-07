@@ -6,6 +6,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
+      - name: Run pwd 1
+        run: pwd
+
+      - uses: actions/checkout@v1
+        with:
+          name: boson-project/func
+      - name: Run pwd 2
+        run: pwd
 
       - name: Set up Go
         uses: actions/setup-go@v2
