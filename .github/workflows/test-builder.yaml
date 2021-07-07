@@ -17,6 +17,3 @@ jobs:
 
       - name: Run
         run: "echo '${{ toJson(github.event.client_payload) }}' | ./builder-image-test"
-
-      - name: Which
-        run: 'which func'
