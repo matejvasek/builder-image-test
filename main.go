@@ -53,16 +53,19 @@ func main() {
 
 	builderImg := data.DockerUrl + ":" + data.UpdatedTags[0]
 
+	failed := false
 	for _, funcBinary := range []string {"func_stable", "func_latest"} {
 		for _, template := range []string {"http", "events"} {
 			err = tryBuild(funcBinary, runtime, template, builderImg)
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "failed to build the function (func binary: %q, template: %q): %q\n", funcBinary, template, err.Error())
-				os.Exit(1)
+				failed = true
 			}
 		}
 	}
-
+	if failed {
+		os.Exit(1)
+	}
 }
 
 // installs two func binaries to the target dir
@@ -93,7 +96,7 @@ func tryBuild(funcBinary string, runtime string, template string, builderImg str
 cd $(mktemp -d)
 %[1]s create fn%[2]s%[3]s --runtime %[2]s --template %[3]s
 cd fn%[2]s%[3]s
-%[1]s build --builder %[4]s --verbose`, funcBinary, runtime, template, builderImg)
+%[1]s build --builder %[4]s`, funcBinary, runtime, template, builderImg)
 	return runBash(script)
 }
 
