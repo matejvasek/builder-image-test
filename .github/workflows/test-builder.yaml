@@ -1,0 +1,22 @@
+name: test-builder
+on: repository_dispatch
+jobs:
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.16
+
+      - run: 'echo "field: ${{ github.event.client_payload.docker_url }}"'
+      - run: 'echo "payload: ${{ toJson(github.event.client_payload) }}"'
+
+      - name: Build
+        run: go build -v ./...
+
+      - name: Run
+        run: ./builder-image-test
