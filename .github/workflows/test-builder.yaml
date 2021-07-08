@@ -12,11 +12,11 @@ jobs:
         with:
           go-version: 1.16
 
-      - name: Build
-        run: go build -v ./...
-
       - name: Install func
         run: ./install_func.sh
 
-      - name: Run
+      - name: Build
+        run: go build -v ./...
+
+      - name: Run Tests
         run: "echo '${{ toJson(github.event.client_payload) }}' | ./builder-image-test"
