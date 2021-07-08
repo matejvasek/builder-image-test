@@ -15,5 +15,8 @@ jobs:
       - name: Build
         run: go build -v ./...
 
+      - name: Install func
+        run: ./install_func.sh
+
       - name: Run
         run: "echo '${{ toJson(github.event.client_payload) }}' | ./builder-image-test"

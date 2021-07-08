@@ -26,21 +26,15 @@ func main() {
 		os.Exit(1)
 	}
 
-	workingDir, err := os.Getwd()
+	homeDir, err := os.UserHomeDir()
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "failed to get working directory: %q", err.Error())
 		os.Exit(0)
 	}
 	path := os.Getenv("PATH")
-	os.Setenv("PATH", fmt.Sprintf("%s:%s", workingDir, path))
+	os.Setenv("PATH", fmt.Sprintf("%s/bin/:%s", homeDir, path))
 
 	os.Setenv("FUNC_REGISTRY", "example.com/jdoe")
-
-	err = installFunc(workingDir)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "failed to install func: %q\n", err.Error())
-		os.Exit(1)
-	}
 
 	builderImg := data.DockerUrl + ":" + data.UpdatedTags[0]
 
@@ -62,35 +56,13 @@ func main() {
 	}
 }
 
-// installs two func binaries to the target dir
-// func_stable -- latest tagged version
-// func_latest -- latest main
-func installFunc(trg string) error {
-	script := fmt.Sprintf(`set -ex
-go get github.com/markbates/pkger/cmd/pkger
-cd $(mktemp -d)
-git clone https://github.com/boson-project/func
-cd func
-make
-cp func %[1]s/func_latest
-make clean
-git fetch --tags
-latestTag=$(git describe --tags $(git rev-list --tags --max-count=1))
-git checkout $latestTag
-make
-cp func %[1]s/func_stable
-cd ..
-rm -fr func`, trg)
-	return runBash(script)
-}
-
 // creates and tries to build a function
 func tryBuild(funcBinary string, runtime string, template string, builderImg string) error {
 	script := fmt.Sprintf(`set -ex
 cd $(mktemp -d)
 %[1]s create fn%[2]s%[3]s --runtime %[2]s --template %[3]s
 cd fn%[2]s%[3]s
-%[1]s build --builder %[4]s`, funcBinary, runtime, template, builderImg)
+%[1]s build --builder %[4]s -v`, funcBinary, runtime, template, builderImg)
 	return runBash(script)
 }
 
